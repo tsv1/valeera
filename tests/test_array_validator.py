@@ -1,0 +1,91 @@
+import unittest
+import district42.json_schema as schema
+from validator_testcase import ValidatorTestCase
+
+
+class TestArrayValidator(ValidatorTestCase):
+  
+  def test_it_validates_type(self):
+    self.assertValidationPasses([],         schema.array)
+    self.assertValidationPasses(['banana'], schema.array)
+    self.assertValidationPasses([0, 1],     schema.array)
+
+    self.assertValidationFails(None,  schema.array)
+    self.assertValidationFails(False, schema.array)
+    self.assertValidationFails(0,     schema.array)
+    self.assertValidationFails('[]',  schema.array)
+    self.assertValidationFails({},    schema.array)
+
+  def test_it_validates_items(self):
+    self.assertValidationPasses([],     schema.array([]))
+    self.assertValidationPasses([42],   schema.array([schema.integer(42)]))
+    self.assertValidationPasses([0, 1], schema.array([schema.integer(0), schema.integer(1)]))
+
+    self.assertValidationFails([],     schema.array([schema.integer(42)]))
+    self.assertValidationFails([42],   schema.array([]))
+    self.assertValidationFails(42,     schema.array([schema.integer(42)]))
+    self.assertValidationFails(['42'], schema.array([schema.integer(42)]))
+    
+    self.assertValidationFails(['banana', 'cucumber', 'carrot'], schema.array([
+      schema.string('banana'),
+      schema.string('cucumber')
+    ]))
+    
+    self.assertValidationFails(['banana', 'cucumber'], schema.array([
+      schema.string('banana'),
+      schema.string('cucumber'),
+      schema.string('carrot')
+    ]))
+
+  def test_it_validates_length(self):
+    self.assertValidationPasses([],         schema.array.empty)
+    self.assertValidationPasses([],         schema.array.length(0))
+    self.assertValidationPasses(['banana'], schema.array.length(1))
+    self.assertValidationPasses([0],        schema.array.length(1, 2))
+    self.assertValidationPasses([0, 1],     schema.array.length(1, 2))
+
+    self.assertValidationFails(['banana'], schema.array.empty)
+    self.assertValidationFails(['banana'], schema.array.length(0))
+    self.assertValidationFails(['banana'], schema.array.length(2))
+    self.assertValidationFails([0, 1],     schema.array.length(0, 1))
+    self.assertValidationFails([0, 1],     schema.array.length(3, 5))
+  
+  def test_it_validates_any_occurrences(self):
+    self.assertValidationPasses([42],          schema.array.contains(schema.integer(42)))
+    self.assertValidationPasses([42, 42],      schema.array.contains(schema.integer(42)))
+    self.assertValidationPasses([1, 2, 42, 3], schema.array.contains(schema.integer(42)))
+
+    self.assertValidationFails([],     schema.array.contains(schema.integer(42)))
+    self.assertValidationFails([0, 1], schema.array.contains(schema.integer(42)))
+
+  def test_it_validates_one_occurrence(self):
+    self.assertValidationPasses([42],      schema.array.contains_one(schema.integer(42)))
+    self.assertValidationPasses([0, 1, 2], schema.array.contains_one(schema.integer(1)))
+
+    self.assertValidationFails([],       schema.array.contains_one(schema.integer(42)))
+    self.assertValidationFails([42, 42], schema.array.contains_one(schema.integer(42)))
+    self.assertValidationFails([0, 1],   schema.array.contains_one(schema.integer(42)))
+
+  def test_it_validates_many_occurrences(self):
+    self.assertValidationPasses([42 ,42], schema.array.contains_many(schema.integer(42)))
+    self.assertValidationPasses([1 ,2, 42, 3, 42, 4, 5],
+                                schema.array.contains_many(schema.integer(42)))
+
+    self.assertValidationFails([],            schema.array.contains_many(schema.integer(42)))
+    self.assertValidationFails([42],          schema.array.contains_many(schema.integer(42)))
+    self.assertValidationFails([1, 2, 42, 3], schema.array.contains_many(schema.integer(42)))
+    self.assertValidationFails([0, 1],        schema.array.contains_many(schema.integer(42)))
+
+  def test_it_validates_nullable(self):
+    self.assertValidationPasses(None, schema.array.nullable)
+    self.assertValidationPasses(None, schema.array([schema.string]).nullable)
+    self.assertValidationPasses(None, schema.array.length(1).nullable)
+
+    self.assertValidationFails(False, schema.array.nullable)
+    self.assertValidationFails(0,     schema.array.nullable)
+    self.assertValidationFails('',    schema.array.nullable)
+    self.assertValidationFails({},    schema.array.nullable)
+
+
+if __name__ == '__main__':
+  unittest.main()
