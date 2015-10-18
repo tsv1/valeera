@@ -45,18 +45,22 @@ class TestArrayOfValidator(ValidatorTestCase):
     )
 
   def test_it_validates_length(self):
+    self.assertValidationPasses([],         schema.array_of(schema.string).empty)
+    self.assertValidationPasses(['banana'], schema.array_of(schema.string).non_empty)
     self.assertValidationPasses(['banana'], schema.array_of(schema.string).length(1))
     self.assertValidationPasses([0],        schema.array_of(schema.integer).length(1, 2))
     self.assertValidationPasses([0, 1],     schema.array_of(schema.integer).length(1, 2))
     self.assertValidationPasses(['banana'], schema.array_of(schema.string).min_length(1))
     self.assertValidationPasses(['banana'], schema.array_of(schema.string).max_length(1))
 
-    self.assertValidationFails([1],       schema.array_of(schema.integer).length(2))
-    self.assertValidationFails([1, 2, 3], schema.array_of(schema.integer).length(2))
-    self.assertValidationFails([0, 1],    schema.array_of(schema.integer).length(0, 1))
-    self.assertValidationFails([0, 1],    schema.array_of(schema.integer).length(3, 5))
-    self.assertValidationFails([],        schema.array_of(schema.integer).min_length(1))
-    self.assertValidationFails([0, 1],    schema.array_of(schema.integer).max_length(1))
+    self.assertValidationFails(['banana'], schema.array_of(schema.string).empty)
+    self.assertValidationFails([],         schema.array_of(schema.string).non_empty)
+    self.assertValidationFails([1],        schema.array_of(schema.integer).length(2))
+    self.assertValidationFails([1, 2, 3],  schema.array_of(schema.integer).length(2))
+    self.assertValidationFails([0, 1],     schema.array_of(schema.integer).length(0, 1))
+    self.assertValidationFails([0, 1],     schema.array_of(schema.integer).length(3, 5))
+    self.assertValidationFails([],         schema.array_of(schema.integer).min_length(1))
+    self.assertValidationFails([0, 1],     schema.array_of(schema.integer).max_length(1))
 
   def test_it_validates_nullable(self):
     self.assertValidationPasses(None, schema.array_of(schema.object).nullable)
