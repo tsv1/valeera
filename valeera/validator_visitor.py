@@ -121,67 +121,6 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
 
     return errors
 
-  def visit_integer(self, schema, pointer):
-    path, actual_val = pointer.path(), pointer.value()
-
-    is_nullable = 'nullable' in schema._params
-    if is_nullable and actual_val is None:
-      return []
-
-    is_type_valid = self.__is_type_valid(actual_val, schema._valuable_types, is_nullable)
-    if not is_type_valid:
-      expected_types = ['integer', 'null'] if is_nullable else 'integer'
-      return [ValidationTypeError(path, actual_val, expected_types)]
-
-    if 'value' in schema._params:
-      expected_val = schema._params['value']
-      is_value_valid = self.__is_value_valid(actual_val, expected_val, is_nullable)
-      if not is_value_valid:
-        return [ValidationValueError(path, actual_val, expected_val)]
-
-    errors = []
-    if 'min_value' in schema._params:
-      if actual_val < schema._params['min_value']:
-        errors += [ValidationMinValueError(path, actual_val, schema._params['min_value'])]
-
-    if 'max_value' in schema._params:
-      if actual_val > schema._params['max_value']:
-        errors += [ValidationMaxValueError(path, actual_val, schema._params['max_value'])]
-
-    if ('multiple' in schema._params) and (actual_val % schema._params['multiple'] != 0):
-      errors += [ValidationRemainderError(path, actual_val, schema._params['multiple'])]
-
-    return errors
-
-  def visit_float(self, schema, pointer):
-    path, actual_val = pointer.path(), pointer.value()
-
-    is_nullable = 'nullable' in schema._params
-    if is_nullable and actual_val is None:
-      return []
-
-    is_type_valid = self.__is_type_valid(actual_val, schema._valuable_types, is_nullable)
-    if not is_type_valid:
-      expected_types = ['float', 'null'] if is_nullable else 'float'
-      return [ValidationTypeError(path, actual_val, expected_types)]
-
-    if 'value' in schema._params:
-      expected_val = schema._params['value']
-      is_value_valid = self.__is_value_valid(actual_val, expected_val, is_nullable)
-      if not is_value_valid:
-        return [ValidationValueError(path, actual_val, expected_val)]
-
-    errors = []
-    if 'min_value' in schema._params:
-      if actual_val < schema._params['min_value']:
-        errors += [ValidationMinValueError(path, actual_val, schema._params['min_value'])]
-
-    if 'max_value' in schema._params:
-      if actual_val > schema._params['max_value']:
-        errors += [ValidationMaxValueError(path, actual_val, schema._params['max_value'])]
-
-    return errors
-
   def visit_string(self, schema, pointer):
     path, actual_val = pointer.path(), pointer.value()
 
