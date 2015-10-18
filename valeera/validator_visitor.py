@@ -38,7 +38,7 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
     if 'alpha_num' in schema._params:
       return r'^[{}]*$'.format(pattern + '0-9')
 
-    return r'^.*$'
+    return r'.*'
 
   def __is_pattern_match(self, actual_val, pattern):
     import re
