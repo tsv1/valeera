@@ -104,6 +104,14 @@ class Formatter(AbstractFormatter):
     return message + ' must be a multiple of {}, {} given'.format(error.divisor,
                                                                   error.actual_val)
 
+  def format_uri_error(self, error):
+    message = 'String'
+    
+    if error.path != Pointer.root:
+      message += ' ' + error.path
+
+    return message + ' must be a correct URI, {} given'.format(repr(error.actual_val))
+
   def format_pattern_mismatch_error(self, error):
     message = 'String'
     

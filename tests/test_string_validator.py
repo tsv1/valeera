@@ -25,6 +25,17 @@ class TestStringValidator(ValidatorTestCase):
     self.assertValidationFails('',       schema.string(' '))
     self.assertValidationFails(' ',      schema.string(''))
 
+  def test_it_validates_uri(self):
+    self.assertValidationPasses('http://localhost',  schema.string.uri)
+    self.assertValidationPasses('http://127.0.0.1',  schema.string.uri)
+    self.assertValidationPasses('http://github.com', schema.string.uri)
+    self.assertValidationPasses('github.com',        schema.string.uri)
+    self.assertValidationPasses('127.0.0.1',         schema.string.uri)
+
+    self.assertValidationFails('http://', schema.string.uri)
+    self.assertValidationFails('//',      schema.string.uri)
+    self.assertValidationFails('?',       schema.string.uri)
+
   def test_it_validates_pattern(self):
     self.assertValidationPasses('banana', schema.string.pattern(r'^[a-z]+$'))
 

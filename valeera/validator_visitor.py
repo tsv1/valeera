@@ -65,6 +65,11 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
     if 'predicate' in schema._params:
       return schema._params['predicate']
     return (lambda a, b: a != b)
+
+  def __is_uri_valid(self, actual_val):
+    from urllib.parse import urlparse
+    attrs = urlparse(actual_val)
+    return attrs.netloc or attrs.path
   
   def visit_null(self, schema, pointer):
     path, actual_val = pointer.path(), pointer.value()
@@ -143,6 +148,11 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
       is_value_valid = self.__is_value_valid(actual_val, expected_val, is_nullable)
       if not is_value_valid:
         return [ValidationValueError(path, actual_val, expected_val)]
+
+    if 'uri' in schema._params:
+      is_uri_valid = self.__is_uri_valid(actual_val)
+      if not is_uri_valid:
+        return [ValidationUriError(path, actual_val)]
 
     pattern = self.__get_pattern(schema)
     is_pattern_match = self.__is_pattern_match(actual_val, pattern)

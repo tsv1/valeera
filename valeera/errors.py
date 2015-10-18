@@ -64,6 +64,16 @@ class ValidationRemainderError(ValidationError):
     return formatter.format_remainder_error(self)
 
 
+class ValidationUriError(ValidationError):
+  
+  def __init__(self, path, actual_val):
+    self.path = path
+    self.actual_val = actual_val
+
+  def format(self, formatter):
+    return formatter.format_uri_error(self)
+
+
 class ValidationPatternMismatchError(ValidationError):
 
   def __init__(self, path, actual_val, pattern):

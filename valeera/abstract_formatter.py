@@ -15,6 +15,9 @@ class AbstractFormatter:
   def format_remainder_error(self, error):
     raise NotImplementedError()
 
+  def format_uri_error(self, error):
+    raise NotImplementedError()
+
   def format_pattern_mismatch_error(self, error):
     raise NotImplementedError()
 
