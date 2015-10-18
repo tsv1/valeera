@@ -51,6 +51,28 @@ class TestNumberValidator(ValidatorTestCase):
     self.assertValidationFails(2,    schema.number.max(1))
     self.assertValidationFails(3.15, schema.number.max(3.14))
 
+  def test_it_validates_range_restriction(self):
+    self.assertValidationPasses(0,  schema.number.between(0, 1))
+    self.assertValidationPasses(1,  schema.number.between(0, 1))
+    self.assertValidationPasses(1,  schema.number.positive)
+    self.assertValidationPasses(0,  schema.number.non_positive)
+    self.assertValidationPasses(-1, schema.number.non_positive)
+    self.assertValidationPasses(-1, schema.number.negative)
+    self.assertValidationPasses(0,  schema.number.non_negative)
+    self.assertValidationPasses(1,  schema.number.non_negative)
+    self.assertValidationPasses(0,  schema.number.unsigned)
+    self.assertValidationPasses(1,  schema.number.unsigned)
+
+    self.assertValidationFails(-1, schema.number.between(0, 1))
+    self.assertValidationFails(2,  schema.number.between(0, 1))
+    self.assertValidationFails(0,  schema.number.positive)
+    self.assertValidationFails(-1, schema.number.positive)
+    self.assertValidationFails(1,  schema.number.non_positive)
+    self.assertValidationFails(0,  schema.number.negative)
+    self.assertValidationFails(1,  schema.number.negative)
+    self.assertValidationFails(-1, schema.number.non_negative)
+    self.assertValidationFails(-1, schema.number.unsigned)
+
   def test_it_validates_multiple(self):
     self.assertValidationPasses(-25, schema.number.multiple(5))
     self.assertValidationPasses(0,   schema.number.multiple(5))
