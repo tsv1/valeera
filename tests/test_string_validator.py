@@ -49,12 +49,14 @@ class TestStringValidator(ValidatorTestCase):
 
   def test_it_validates_length(self):
     self.assertValidationPasses('',   schema.string.empty)
+    self.assertValidationPasses(' ',  schema.string.non_empty)
     self.assertValidationPasses('',   schema.string.length(0))
     self.assertValidationPasses('a',  schema.string.length(1))
     self.assertValidationPasses('a',  schema.string.length(1, 2))
     self.assertValidationPasses('ab', schema.string.length(1, 2))
 
     self.assertValidationFails(' ',  schema.string.empty)
+    self.assertValidationFails('',   schema.string.non_empty)
     self.assertValidationFails(' ',  schema.string.length(0))
     self.assertValidationFails('a',  schema.string.length(2))
     self.assertValidationFails('ab', schema.string.length(0, 1))

@@ -39,12 +39,14 @@ class TestArrayValidator(ValidatorTestCase):
 
   def test_it_validates_length(self):
     self.assertValidationPasses([],         schema.array.empty)
+    self.assertValidationPasses([None],     schema.array.non_empty)
     self.assertValidationPasses([],         schema.array.length(0))
     self.assertValidationPasses(['banana'], schema.array.length(1))
     self.assertValidationPasses([0],        schema.array.length(1, 2))
     self.assertValidationPasses([0, 1],     schema.array.length(1, 2))
 
     self.assertValidationFails(['banana'], schema.array.empty)
+    self.assertValidationFails([],         schema.array.non_empty)
     self.assertValidationFails(['banana'], schema.array.length(0))
     self.assertValidationFails(['banana'], schema.array.length(2))
     self.assertValidationFails([0, 1],     schema.array.length(0, 1))

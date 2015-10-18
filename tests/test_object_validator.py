@@ -93,6 +93,7 @@ class TestObjectValidator(ValidatorTestCase):
 
   def test_it_validates_length(self):
     self.assertValidationPasses({},                           schema.object.empty)
+    self.assertValidationPasses({'id': 42},                   schema.object.non_empty)
     self.assertValidationPasses({},                           schema.object.length(0))
     self.assertValidationPasses({'id': 42},                   schema.object.length(1))
     self.assertValidationPasses({'id': 42},                   schema.object.length(1, 2))
@@ -108,6 +109,7 @@ class TestObjectValidator(ValidatorTestCase):
     )
 
     self.assertValidationFails({'id': 42},                    schema.object.empty)
+    self.assertValidationFails({},                            schema.object.non_empty)
     self.assertValidationFails({'id': 42},                    schema.object.length(0))
     self.assertValidationFails({'id': 42},                    schema.object.length(2))
     self.assertValidationFails({'id': 42, 'deleted': False},  schema.object.length(0, 1))
