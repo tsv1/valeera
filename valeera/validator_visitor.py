@@ -255,17 +255,24 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
       return [ValidationTypeError(path, actual_val, expected_types)]
  
     errors = []
-    for key, item_schema in schema._params['keys'].items():
-      new_pointer = pointer.move(key)
-      if self.__is_undefined(item_schema):
-        if new_pointer.has_value():
-          errors += [ValidationExtraKeyError(new_pointer.path(), key)]
-      else:
-        try:
-          errors += item_schema.accept(self, new_pointer)
-        except KeyError:
-          if self.__is_required(item_schema):
-            errors += [ValidationMissingKeyError(new_pointer.path())]
+
+    if 'keys' in schema._params:
+      for key, item_schema in schema._params['keys'].items():
+        new_pointer = pointer.move(key)
+        if self.__is_undefined(item_schema):
+          if new_pointer.has_value():
+            errors += [ValidationExtraKeyError(new_pointer.path(), key)]
+        else:
+          try:
+            errors += item_schema.accept(self, new_pointer)
+          except KeyError:
+            if self.__is_required(item_schema):
+              errors += [ValidationMissingKeyError(new_pointer.path())]
+    
+    if ('keys' in schema._params) and ('strict' in schema._params):
+      for key in actual_val.keys():
+        if key not in schema._params['keys']:
+          errors += [ValidationExtraKeyError(path, key)]
 
     if 'length' in schema._params:
       if not self.__is_length_match(actual_val, schema._params['length'], '__eq__'):

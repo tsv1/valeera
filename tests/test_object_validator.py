@@ -49,6 +49,32 @@ class TestObjectValidator(ValidatorTestCase):
     self.assertValidationFails({},          schema.object({'id': schema.integer}))
     self.assertValidationFails({'id': '1'}, schema.object({'id': schema.integer}))
 
+  def test_it_validates_strict_keys(self):
+    self.assertValidationPasses({}, schema.object({}).strict)
+    self.assertValidationPasses(
+      {
+        'id': 1234,
+        'title': 'banana'
+      },
+      schema.object({
+        'id':    schema.integer,
+        'title': schema.string
+      }).strict
+    )
+
+    self.assertValidationFails({'id': '1'}, schema.object({}).strict)
+    self.assertValidationFails(
+      {
+        'id': 1234,
+        'title': 'banana',
+        'extra_key': True
+      },
+      schema.object({
+        'id':    schema.integer,
+        'title': schema.string
+      }).strict
+    )
+
   def test_it_validates_optional_keys(self):
     self.assertValidationPasses(
       {
