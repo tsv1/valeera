@@ -60,6 +60,11 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
 
   def __is_required(self, schema):
     return 'required' not in schema._params or schema._params['required']
+
+  def __get_predicate(self, schema):
+    if 'predicate' in schema._params:
+      return schema._params['predicate']
+    return (lambda a, b: a != b)
   
   def visit_null(self, schema, pointer):
     path, actual_val = pointer.path(), pointer.value()
@@ -209,10 +214,7 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
         errors.append(ValidationMaxLengthError(path, actual_val, schema._params['max_length']))
 
     if 'unique' in schema._params:
-      if 'predicate' in schema._params:
-        predicate = schema._params['predicate']
-      else:
-        predicate = lambda a, b: a != b
+      predicate = self.__get_predicate(schema)
       for i in range(len(actual_val)):
         for j in range(i + 1, len(actual_val)):
           if not predicate(actual_val[i], actual_val[j]):
@@ -248,6 +250,13 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
     if 'max_length' in schema._params:
       if not self.__is_length_match(actual_val, schema._params['max_length'], '__le__'):
         errors.append(ValidationMaxLengthError(path, actual_val, schema._params['max_length']))
+
+    if 'unique' in schema._params:
+      predicate = self.__get_predicate(schema)
+      for i in range(len(actual_val)):
+        for j in range(i + 1, len(actual_val)):
+          if not predicate(actual_val[i], actual_val[j]):
+            errors += [ValidationUniquenessError(path, actual_val)]
 
     return errors
 

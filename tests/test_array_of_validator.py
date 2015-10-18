@@ -20,6 +20,30 @@ class TestArrayOfValidator(ValidatorTestCase):
     self.assertValidationFails(['banana', 'cucumber'], schema.array_of(schema.integer))
     self.assertValidationFails([1, 2, 3],              schema.array_of(schema.string))
 
+  def test_it_validates_uniqueness(self):
+    self.assertValidationPasses([0, 1], schema.array_of(schema.integer).unique)
+
+    self.assertValidationPasses(
+      [
+        {'id': 1},
+        {'id': 2}
+      ],
+      schema.array_of(schema.object({
+        'id': schema.integer
+      })).unique(lambda a, b: a['id'] != b['id'])
+    )
+
+    self.assertValidationFails([42, 42], schema.array_of(schema.integer).unique)
+    self.assertValidationFails(
+      [
+        {'id': 1},
+        {'id': 1}
+      ],
+      schema.array_of(schema.object({
+        'id': schema.integer
+      })).unique(lambda a, b: a['id'] != b['id'])
+    )
+
   def test_it_validates_length(self):
     self.assertValidationPasses(['banana'], schema.array_of(schema.string).length(1))
     self.assertValidationPasses([0],        schema.array_of(schema.integer).length(1, 2))
