@@ -142,6 +142,16 @@ class ValidationExactlyOccurrenceError(ValidationError):
     return formatter.format_exactly_occurrence_error(self)
 
 
+class ValidationUniquenessError(ValidationError):
+  
+  def __init__(self, path, actual_val):
+    self.path = path
+    self.actual_val = actual_val
+
+  def format(self, formatter):
+    return formatter.format_uniqueness_error(self)
+
+
 class ValidationMissingKeyError(ValidationError):
 
   def __init__(self, path):

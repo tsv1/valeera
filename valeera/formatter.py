@@ -151,6 +151,14 @@ class Formatter(AbstractFormatter):
       '' if error.exactly_count == 1 else 's',
       error.expected_schema
     )
+
+  def format_uniqueness_error(self, error):
+    message = 'Array'
+    
+    if error.path != Pointer.root:
+      message += ' ' + error.path
+
+    return message + ' must be unique'
   
   def format_missing_key_error(self, error):
     return 'Key {} does not exist'.format(error.path)

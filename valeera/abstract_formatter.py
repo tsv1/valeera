@@ -36,6 +36,9 @@ class AbstractFormatter:
   def format_exactly_occurrence_error(self, error):
     raise NotImplementedError()
 
+  def format_uniqueness_error(self, error):
+    raise NotImplementedError()
+
   def format_missing_key_error(self, error):
     raise NotImplementedError()
 

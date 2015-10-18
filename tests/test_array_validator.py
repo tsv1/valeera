@@ -37,6 +37,17 @@ class TestArrayValidator(ValidatorTestCase):
       schema.string('carrot')
     ]))
 
+  def test_it_validates_uniqueness(self):
+    self.assertValidationPasses([],     schema.array.unique)
+    self.assertValidationPasses([0, 1], schema.array.unique)
+
+    self.assertValidationPasses([{'id': 1}, {'id': 2}],
+                                schema.array.unique(lambda a, b: a['id'] != b['id']))
+
+    self.assertValidationFails([42, 42], schema.array.unique)
+    self.assertValidationFails([{'id': 1}, {'id': 1}],
+                               schema.array.unique(lambda a, b: a['id'] != b['id']))
+
   def test_it_validates_length(self):
     self.assertValidationPasses([],         schema.array.empty)
     self.assertValidationPasses([None],     schema.array.non_empty)
