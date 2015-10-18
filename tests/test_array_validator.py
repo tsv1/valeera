@@ -44,6 +44,8 @@ class TestArrayValidator(ValidatorTestCase):
     self.assertValidationPasses(['banana'], schema.array.length(1))
     self.assertValidationPasses([0],        schema.array.length(1, 2))
     self.assertValidationPasses([0, 1],     schema.array.length(1, 2))
+    self.assertValidationPasses(['banana'], schema.array.min_length(1))
+    self.assertValidationPasses(['banana'], schema.array.max_length(1))
 
     self.assertValidationFails(['banana'], schema.array.empty)
     self.assertValidationFails([],         schema.array.non_empty)
@@ -51,6 +53,8 @@ class TestArrayValidator(ValidatorTestCase):
     self.assertValidationFails(['banana'], schema.array.length(2))
     self.assertValidationFails([0, 1],     schema.array.length(0, 1))
     self.assertValidationFails([0, 1],     schema.array.length(3, 5))
+    self.assertValidationFails([],         schema.array.min_length(1))
+    self.assertValidationFails([0, 1],     schema.array.max_length(1))
   
   def test_it_validates_any_occurrences(self):
     self.assertValidationPasses([42],          schema.array.contains(schema.integer(42)))

@@ -24,11 +24,15 @@ class TestArrayOfValidator(ValidatorTestCase):
     self.assertValidationPasses(['banana'], schema.array_of(schema.string).length(1))
     self.assertValidationPasses([0],        schema.array_of(schema.integer).length(1, 2))
     self.assertValidationPasses([0, 1],     schema.array_of(schema.integer).length(1, 2))
+    self.assertValidationPasses(['banana'], schema.array_of(schema.string).min_length(1))
+    self.assertValidationPasses(['banana'], schema.array_of(schema.string).max_length(1))
 
     self.assertValidationFails([1],       schema.array_of(schema.integer).length(2))
     self.assertValidationFails([1, 2, 3], schema.array_of(schema.integer).length(2))
     self.assertValidationFails([0, 1],    schema.array_of(schema.integer).length(0, 1))
     self.assertValidationFails([0, 1],    schema.array_of(schema.integer).length(3, 5))
+    self.assertValidationFails([],        schema.array_of(schema.integer).min_length(1))
+    self.assertValidationFails([0, 1],    schema.array_of(schema.integer).max_length(1))
 
   def test_it_validates_nullable(self):
     self.assertValidationPasses(None, schema.array_of(schema.object).nullable)

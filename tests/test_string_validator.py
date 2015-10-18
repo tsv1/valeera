@@ -54,6 +54,8 @@ class TestStringValidator(ValidatorTestCase):
     self.assertValidationPasses('a',  schema.string.length(1))
     self.assertValidationPasses('a',  schema.string.length(1, 2))
     self.assertValidationPasses('ab', schema.string.length(1, 2))
+    self.assertValidationPasses('a',  schema.string.min_length(1))
+    self.assertValidationPasses('a',  schema.string.max_length(1))
 
     self.assertValidationFails(' ',  schema.string.empty)
     self.assertValidationFails('',   schema.string.non_empty)
@@ -61,6 +63,8 @@ class TestStringValidator(ValidatorTestCase):
     self.assertValidationFails('a',  schema.string.length(2))
     self.assertValidationFails('ab', schema.string.length(0, 1))
     self.assertValidationFails('ab', schema.string.length(3, 5))
+    self.assertValidationFails('',   schema.string.min_length(1))
+    self.assertValidationFails('ab', schema.string.max_length(1))
 
   def test_it_validates_nullable(self):
     self.assertValidationPasses(None, schema.string.nullable)
