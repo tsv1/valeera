@@ -4,6 +4,8 @@ from .errors import *
 
 class ValidatorVisitor(district42.json_schema.AbstractVisitor):
 
+  iso8601 = r'^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$'
+
   def __is_type_valid(self, actual_val, valid_types, is_nullable):
     if type(actual_val) in valid_types: return True
     if is_nullable and actual_val is None: return True
@@ -172,6 +174,52 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
         return [ValidationMaxLengthError(path, actual_val, schema._params['max_length'])]
 
     return []
+
+  def visit_timestamp(self, schema, pointer):
+    path, actual_val = pointer.path(), pointer.value()
+
+    is_nullable = 'nullable' in schema._params
+    if is_nullable and actual_val is None:
+      return []
+
+    is_type_valid = self.__is_type_valid(actual_val, schema._valuable_types, is_nullable)
+    if not is_type_valid:
+      expected_types = ['timestamp', 'null'] if is_nullable else 'timestamp'
+      return [ValidationTypeError(path, actual_val, expected_types)]
+
+    try:
+      import delorean
+      timestamp = delorean.parse(actual_val)
+    except ValueError:
+      return [ValidationTimestampError(path, actual_val)]
+
+    if 'value' in schema._params:
+      expected_val = schema._params['value']
+      is_value_valid = self.__is_value_valid(timestamp, expected_val, is_nullable)
+      if not is_value_valid:
+        return [ValidationValueError(path, actual_val, expected_val.datetime.isoformat())]
+
+    errors = []
+    if 'min_value' in schema._params:
+      min_value = schema._params['min_value']
+      if timestamp < min_value:
+        errors += [ValidationMinValueError(path, actual_val, min_value.datetime.isoformat())]
+
+    if 'max_value' in schema._params:
+      max_value = schema._params['max_value']
+      if timestamp > max_value:
+        errors += [ValidationMaxValueError(path, actual_val, max_value.datetime.isoformat())]
+
+    if 'iso' in schema._params:
+      is_pattern_match = self.__is_pattern_match(actual_val, self.iso8601)
+      if not is_pattern_match:
+        errors += [ValidationTimestampFormatError(path, actual_val, 'ISO 8601')]
+    elif 'format' in schema._params:
+      expected_format = schema._params['format']
+      if actual_val != timestamp.datetime.strftime(expected_format):
+        errors += [ValidationTimestampFormatError(path, actual_val, expected_format)]
+
+    return errors
 
   def visit_array(self, schema, pointer):
     path, actual_val = pointer.path(), pointer.value()

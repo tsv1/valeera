@@ -121,6 +121,23 @@ class Formatter(AbstractFormatter):
     return message + ' must match pattern "{}", {} given'.format(error.pattern,
                                                                  repr(error.actual_val))
 
+  def format_timestamp_format_error(self, error):
+    message = 'Timestamp'
+
+    if error.path != Pointer.root:
+      message += ' ' + error.path
+
+    return message + ' must match format "{}", {} given'.format(error.timestamp_format,
+                                                                repr(error.actual_val))
+
+  def format_timestamp_error(self, error):
+    message = 'Value'
+
+    if error.path != Pointer.root:
+      message += ' ' + error.path
+
+    return message + ' must be a valid string representation of a timestamp'
+
   def format_length_error(self, error):
     return self.__get_length_error_message(error.path, error.actual_type, 'exactly',
                                            error.length)

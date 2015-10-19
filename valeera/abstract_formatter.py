@@ -21,6 +21,12 @@ class AbstractFormatter:
   def format_pattern_mismatch_error(self, error):
     raise NotImplementedError()
 
+  def format_timestamp_error(self, error):
+    raise NotImplementedError()
+
+  def format_timestamp_format_error(self, error):
+    raise NotImplementedError()
+
   def format_length_error(self, error):
     raise NotImplementedError()
 

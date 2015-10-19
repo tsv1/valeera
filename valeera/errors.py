@@ -1,5 +1,5 @@
 class ValidationError:
-  
+
   def _get_type_as_string(self, value):
     return str(type(value))[8:-2]
 
@@ -83,6 +83,27 @@ class ValidationPatternMismatchError(ValidationError):
 
   def format(self, formatter):
     return formatter.format_pattern_mismatch_error(self)
+
+
+class ValidationTimestampError(ValidationError):
+  
+  def __init__(self, path, actual_val):
+    self.path = path
+    self.actual_val = actual_val
+
+  def format(self, formatter):
+    return formatter.format_timestamp_error(self)
+
+
+class ValidationTimestampFormatError(ValidationError):
+
+  def __init__(self, path, actual_val, timestamp_format):
+    self.path = path
+    self.actual_val = actual_val
+    self.timestamp_format = timestamp_format
+
+  def format(self, formatter):
+    return formatter.format_timestamp_format_error(self)
 
 
 class ValidationLengthError(ValidationError):
