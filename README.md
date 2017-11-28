@@ -6,7 +6,7 @@ Validator for [district42 schema](https://github.com/nikitanovosibirsk/district4
 
 ```python
 import valeera
-import district42.json_schema as schema
+from district42 import json_schema as schema
 
 assert 42 == schema.integer.positive
 ```
@@ -14,7 +14,7 @@ assert 42 == schema.integer.positive
 ### Advanced Usage
 
 ```python
-import district42.json_schema as schema
+from district42 import json_schema as schema
 from valeera import Validator, Formatter
 
 validator = Validator(Formatter()).validate(-1, schema.integer.positive)
@@ -28,4 +28,11 @@ validator.errors() # ['Number value must be greater than or equal to 1, -1 given
 
 ```sh
 $ pip3 install valeera
+```
+
+### Tests
+
+```sh
+$ python3 setup.py install
+$ python3 -m unittest tests
 ```

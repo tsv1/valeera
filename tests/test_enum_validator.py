@@ -1,5 +1,5 @@
 import unittest
-import district42.json_schema as schema
+from district42 import json_schema as schema
 from validator_testcase import ValidatorTestCase
 
 
