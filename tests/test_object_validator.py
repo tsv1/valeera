@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from district42 import json_schema as schema
 
@@ -6,7 +7,7 @@ from .validator_testcase import ValidatorTestCase
 
 
 class TestObjectValidator(ValidatorTestCase):
-  
+
   def test_it_validates_type(self):
     self.assertValidationPasses({},         schema.object)
     self.assertValidationPasses({'id': 42}, schema.object)
@@ -156,11 +157,14 @@ class TestObjectValidator(ValidatorTestCase):
     )
 
   def test_it_validates_nullable(self):
-    self.assertValidationPasses(None,       schema.object.nullable)
-    self.assertValidationPasses(None,       schema.object({'id': schema.integer}).nullable)
-    self.assertValidationPasses({'id': 42}, schema.object({'id': schema.integer}).nullable)
+    with warnings.catch_warnings():
+      warnings.simplefilter('ignore')
 
-    self.assertValidationFails(False, schema.object.nullable)
-    self.assertValidationFails(0,     schema.object.nullable)
-    self.assertValidationFails('',    schema.object.nullable)
-    self.assertValidationFails([],    schema.object.nullable)
+      self.assertValidationPasses(None,       schema.object.nullable)
+      self.assertValidationPasses(None,       schema.object({'id': schema.integer}).nullable)
+      self.assertValidationPasses({'id': 42}, schema.object({'id': schema.integer}).nullable)
+
+      self.assertValidationFails(False, schema.object.nullable)
+      self.assertValidationFails(0,     schema.object.nullable)
+      self.assertValidationFails('',    schema.object.nullable)
+      self.assertValidationFails([],    schema.object.nullable)

@@ -391,7 +391,7 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
       option_errors = option.accept(self, pointer)
       if len(option_errors) == 0:
         return []
-    
+
     return [ValidationSchemaMismatchError(path, actual_val, schema._params['options'])]
 
   def visit_one_of(self, schema, pointer):
@@ -416,9 +416,6 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
     path, actual_val = pointer.path(), pointer.value()
 
     is_nullable = 'nullable' in schema._params
-    if is_nullable and actual_val is None:
-      return []
-
     enumerators = schema._params['enumerators']
     is_value_allowed = self.__is_value_allowed(actual_val, enumerators, is_nullable)
     if not is_value_allowed:

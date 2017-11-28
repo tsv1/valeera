@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from district42 import json_schema as schema
 
@@ -6,7 +7,7 @@ from .validator_testcase import ValidatorTestCase
 
 
 class TestStringValidator(ValidatorTestCase):
-  
+
   def test_it_validates_type(self):
     self.assertValidationPasses('banana', schema.string)
     self.assertValidationPasses('',       schema.string)
@@ -80,10 +81,13 @@ class TestStringValidator(ValidatorTestCase):
     self.assertValidationFails('ab', schema.string.max_length(1))
 
   def test_it_validates_nullable(self):
-    self.assertValidationPasses(None, schema.string.nullable)
-    self.assertValidationPasses(None, schema.string('banana').nullable)
+    with warnings.catch_warnings():
+      warnings.simplefilter('ignore')
 
-    self.assertValidationFails(False, schema.string.nullable)
-    self.assertValidationFails(0,     schema.string.nullable)
-    self.assertValidationFails([],    schema.string.nullable)
-    self.assertValidationFails({},    schema.string.nullable)
+      self.assertValidationPasses(None, schema.string.nullable)
+      self.assertValidationPasses(None, schema.string('banana').nullable)
+
+      self.assertValidationFails(False, schema.string.nullable)
+      self.assertValidationFails(0,     schema.string.nullable)
+      self.assertValidationFails([],    schema.string.nullable)
+      self.assertValidationFails({},    schema.string.nullable)

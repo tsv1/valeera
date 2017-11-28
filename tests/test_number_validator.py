@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from district42 import json_schema as schema
 
@@ -6,7 +7,10 @@ from .validator_testcase import ValidatorTestCase
 
 
 class TestNumberValidator(ValidatorTestCase):
-  
+
+  def setUp(self):
+    warnings.simplefilter('ignore')
+
   def test_it_validates_type(self):
     self.assertValidationPasses(-3.14, schema.number)
     self.assertValidationPasses(-1,    schema.number)

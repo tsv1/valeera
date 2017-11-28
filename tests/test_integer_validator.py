@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from district42 import json_schema as schema
 
@@ -6,7 +7,7 @@ from .validator_testcase import ValidatorTestCase
 
 
 class TestIntegerValidator(ValidatorTestCase):
-  
+
   def test_it_validates_type(self):
     self.assertValidationPasses(-1, schema.integer)
     self.assertValidationPasses(0,  schema.integer)
@@ -50,10 +51,12 @@ class TestIntegerValidator(ValidatorTestCase):
     self.assertValidationFails(1, schema.integer.multiple(5))
 
   def test_it_validates_nullable(self):
-    self.assertValidationPasses(None, schema.integer.nullable)
-    self.assertValidationPasses(None, schema.integer(42).nullable)
+    with warnings.catch_warnings():
+      warnings.simplefilter('ignore')
+      self.assertValidationPasses(None, schema.integer.nullable)
+      self.assertValidationPasses(None, schema.integer(42).nullable)
 
-    self.assertValidationFails(False, schema.integer.nullable)
-    self.assertValidationFails('',    schema.integer.nullable)
-    self.assertValidationFails([],    schema.integer.nullable)
-    self.assertValidationFails({},    schema.integer.nullable)
+      self.assertValidationFails(False, schema.integer.nullable)
+      self.assertValidationFails('',    schema.integer.nullable)
+      self.assertValidationFails([],    schema.integer.nullable)
+      self.assertValidationFails({},    schema.integer.nullable)

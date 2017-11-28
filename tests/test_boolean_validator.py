@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from district42 import json_schema as schema
 
@@ -6,7 +7,7 @@ from .validator_testcase import ValidatorTestCase
 
 
 class TestBooleanValidator(ValidatorTestCase):
-  
+
   def test_it_validates_type(self):
     self.assertValidationPasses(True,  schema.boolean)
     self.assertValidationPasses(False, schema.boolean)
@@ -28,11 +29,14 @@ class TestBooleanValidator(ValidatorTestCase):
     self.assertValidationFails(False, schema.boolean(True))
 
   def test_it_validates_nullable(self):
-    self.assertValidationPasses(None,  schema.boolean(True).nullable)
-    self.assertValidationPasses(False, schema.boolean(False).nullable)
-    self.assertValidationPasses(True,  schema.boolean.nullable)
+    with warnings.catch_warnings():
+      warnings.simplefilter('ignore')
 
-    self.assertValidationFails(0,  schema.boolean.nullable)
-    self.assertValidationFails('', schema.boolean.nullable)
-    self.assertValidationFails([], schema.boolean.nullable)
-    self.assertValidationFails({}, schema.boolean.nullable)
+      self.assertValidationPasses(None,  schema.boolean(True).nullable)
+      self.assertValidationPasses(False, schema.boolean(False).nullable)
+      self.assertValidationPasses(True,  schema.boolean.nullable)
+
+      self.assertValidationFails(0,  schema.boolean.nullable)
+      self.assertValidationFails('', schema.boolean.nullable)
+      self.assertValidationFails([], schema.boolean.nullable)
+      self.assertValidationFails({}, schema.boolean.nullable)

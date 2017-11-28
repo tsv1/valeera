@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from district42 import json_schema as schema
 
@@ -6,7 +7,7 @@ from .validator_testcase import ValidatorTestCase
 
 
 class TestArrayValidator(ValidatorTestCase):
-  
+
   def test_it_validates_type(self):
     self.assertValidationPasses([],         schema.array)
     self.assertValidationPasses(['banana'], schema.array)
@@ -96,11 +97,14 @@ class TestArrayValidator(ValidatorTestCase):
     self.assertValidationFails([0, 1],        schema.array.contains_many(schema.integer(42)))
 
   def test_it_validates_nullable(self):
-    self.assertValidationPasses(None, schema.array.nullable)
-    self.assertValidationPasses(None, schema.array([schema.string]).nullable)
-    self.assertValidationPasses(None, schema.array.length(1).nullable)
+    with warnings.catch_warnings():
+      warnings.simplefilter('ignore')
 
-    self.assertValidationFails(False, schema.array.nullable)
-    self.assertValidationFails(0,     schema.array.nullable)
-    self.assertValidationFails('',    schema.array.nullable)
-    self.assertValidationFails({},    schema.array.nullable)
+      self.assertValidationPasses(None, schema.array.nullable)
+      self.assertValidationPasses(None, schema.array([schema.string]).nullable)
+      self.assertValidationPasses(None, schema.array.length(1).nullable)
+
+      self.assertValidationFails(False, schema.array.nullable)
+      self.assertValidationFails(0,     schema.array.nullable)
+      self.assertValidationFails('',    schema.array.nullable)
+      self.assertValidationFails({},    schema.array.nullable)

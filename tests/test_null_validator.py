@@ -6,7 +6,7 @@ from .validator_testcase import ValidatorTestCase
 
 
 class TestNullValidator(ValidatorTestCase):
-  
+
   def test_it_validates_type(self):
     self.assertValidationPasses(None, schema.null)
 

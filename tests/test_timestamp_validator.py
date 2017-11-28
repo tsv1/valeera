@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from district42 import json_schema as schema
 
@@ -6,7 +7,7 @@ from .validator_testcase import ValidatorTestCase
 
 
 class TestTimestampValidator(ValidatorTestCase):
-  
+
   def test_it_validates_type(self):
     self.assertValidationPasses('21-10-2015 04:29 pm', schema.timestamp)
 
@@ -62,10 +63,13 @@ class TestTimestampValidator(ValidatorTestCase):
     self.assertValidationFails('23-10-2015', timestamp)
 
   def test_it_validates_nullable(self):
-    self.assertValidationPasses(None, schema.timestamp.nullable)
-    self.assertValidationPasses(None, schema.timestamp('21/10/2015').nullable)
+    with warnings.catch_warnings():
+      warnings.simplefilter('ignore')
 
-    self.assertValidationFails(False, schema.timestamp.nullable)
-    self.assertValidationFails(0,     schema.timestamp.nullable)
-    self.assertValidationFails([],    schema.timestamp.nullable)
-    self.assertValidationFails({},    schema.timestamp.nullable)
+      self.assertValidationPasses(None, schema.timestamp.nullable)
+      self.assertValidationPasses(None, schema.timestamp('21/10/2015').nullable)
+
+      self.assertValidationFails(False, schema.timestamp.nullable)
+      self.assertValidationFails(0,     schema.timestamp.nullable)
+      self.assertValidationFails([],    schema.timestamp.nullable)
+      self.assertValidationFails({},    schema.timestamp.nullable)
