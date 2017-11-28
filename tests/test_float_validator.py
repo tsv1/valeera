@@ -1,6 +1,8 @@
 import unittest
+
 from district42 import json_schema as schema
-from validator_testcase import ValidatorTestCase
+
+from .validator_testcase import ValidatorTestCase
 
 
 class TestFloatValidator(ValidatorTestCase):
@@ -48,7 +50,3 @@ class TestFloatValidator(ValidatorTestCase):
     self.assertValidationFails('',    schema.float.nullable)
     self.assertValidationFails([],    schema.float.nullable)
     self.assertValidationFails({},    schema.float.nullable)
-
-
-if __name__ == '__main__':
-  unittest.main()

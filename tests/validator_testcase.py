@@ -1,5 +1,6 @@
 import unittest
-from valeera import Validator, Formatter
+
+from valeera import Formatter, Validator
 
 
 class ValidatorTestCase(unittest.TestCase):

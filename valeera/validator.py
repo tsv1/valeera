@@ -1,6 +1,6 @@
 from .abstract_validator import AbstractValidator
-from .validator_visitor import ValidatorVisitor
 from .pointer import Pointer
+from .validator_visitor import ValidatorVisitor
 
 
 class Validator(AbstractValidator):

@@ -1,6 +1,8 @@
 import unittest
+
 from district42 import json_schema as schema
-from validator_testcase import ValidatorTestCase
+
+from .validator_testcase import ValidatorTestCase
 
 
 class TestEnumValidator(ValidatorTestCase):
@@ -22,7 +24,3 @@ class TestEnumValidator(ValidatorTestCase):
     self.assertValidationFails('',    schema.enum('true', 'false').nullable)
     self.assertValidationFails([],    schema.enum('true', 'false').nullable)
     self.assertValidationFails({},    schema.enum('true', 'false').nullable)
-
-
-if __name__ == '__main__':
-  unittest.main()

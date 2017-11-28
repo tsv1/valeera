@@ -1,6 +1,8 @@
 import unittest
+
 from district42 import json_schema as schema
-from validator_testcase import ValidatorTestCase
+
+from .validator_testcase import ValidatorTestCase
 
 
 class TestIntegerValidator(ValidatorTestCase):
@@ -55,7 +57,3 @@ class TestIntegerValidator(ValidatorTestCase):
     self.assertValidationFails('',    schema.integer.nullable)
     self.assertValidationFails([],    schema.integer.nullable)
     self.assertValidationFails({},    schema.integer.nullable)
-
-
-if __name__ == '__main__':
-  unittest.main()

@@ -1,7 +1,8 @@
 import unittest
 
 from district42 import json_schema as schema
-from validator_testcase import ValidatorTestCase
+
+from .validator_testcase import ValidatorTestCase
 
 
 class TestAnyOfValidator(ValidatorTestCase):
@@ -34,7 +35,3 @@ class TestAnyOfValidator(ValidatorTestCase):
     self.assertValidationFails('',    schema.any_of(option1, option2).nullable)
     self.assertValidationFails([],    schema.any_of(option1, option2).nullable)
     self.assertValidationFails({},    schema.any_of(option1, option2).nullable)
-
-
-if __name__ == '__main__':
-  unittest.main()

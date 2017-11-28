@@ -1,6 +1,8 @@
 import unittest
+
 from district42 import json_schema as schema
-from validator_testcase import ValidatorTestCase
+
+from .validator_testcase import ValidatorTestCase
 
 
 class TestTimestampValidator(ValidatorTestCase):
@@ -67,7 +69,3 @@ class TestTimestampValidator(ValidatorTestCase):
     self.assertValidationFails(0,     schema.timestamp.nullable)
     self.assertValidationFails([],    schema.timestamp.nullable)
     self.assertValidationFails({},    schema.timestamp.nullable)
-
-
-if __name__ == '__main__':
-  unittest.main()

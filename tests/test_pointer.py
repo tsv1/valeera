@@ -1,4 +1,5 @@
 import unittest
+
 from valeera.pointer import Pointer
 
 
@@ -90,7 +91,3 @@ class TestPointer(unittest.TestCase):
 
     self.assertEqual(origin_pointer.path(), '#')
     self.assertEqual(origin_pointer.value(), self.dictionary)
-
-
-if __name__ == '__main__':
-  unittest.main()

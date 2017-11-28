@@ -1,4 +1,5 @@
 import district42.json_schema
+
 from .errors import *
 
 
