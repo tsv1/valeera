@@ -44,9 +44,25 @@ class TestStringValidator(ValidatorTestCase):
 
     self.assertValidationFails('banana', schema.string.pattern(r'^[0-9]+$'))
 
+  def test_it_validates_numeric(self):
+    self.assertValidationPasses('1234',        schema.string.numeric)
+    self.assertValidationPasses('-1234',       schema.string.numeric)
+    self.assertValidationPasses('2147483647',  schema.string.numeric(2147483647))
+    self.assertValidationPasses('-2147483648', schema.string.numeric(-2147483648))
+    self.assertValidationPasses('-1',          schema.string.numeric(-1, 1))
+    self.assertValidationPasses('1',           schema.string.numeric(1, 1))
+
+    self.assertValidationFails('id', schema.string.numeric)
+    self.assertValidationFails('-',  schema.string.numeric)
+    self.assertValidationFails('--',  schema.string.numeric)
+
+    self.assertValidationFails('2147483646',  schema.string.numeric(2147483647))
+    self.assertValidationFails('-2147483649', schema.string.numeric(-2147483648))
+    self.assertValidationFails('-2',          schema.string.numeric(-1, 1))
+    self.assertValidationFails('2',           schema.string.numeric(-1, 1))
+
   def test_it_validates_alphabet(self):
     self.assertValidationPasses('id',     schema.string.alphabetic)
-    self.assertValidationPasses('1234',   schema.string.numeric)
     self.assertValidationPasses('id1234', schema.string.alpha_num)
     self.assertValidationPasses('id',     schema.string.alphabetic.lowercase)
     self.assertValidationPasses('ID',     schema.string.alphabetic.uppercase)
@@ -54,7 +70,6 @@ class TestStringValidator(ValidatorTestCase):
     self.assertValidationPasses('ID1234', schema.string.alpha_num.uppercase)
 
     self.assertValidationFails('1234',   schema.string.alphabetic)
-    self.assertValidationFails('id',     schema.string.numeric)
     self.assertValidationFails(' ',      schema.string.alpha_num)
     self.assertValidationFails('ID',     schema.string.alphabetic.lowercase)
     self.assertValidationFails('id',     schema.string.alphabetic.uppercase)

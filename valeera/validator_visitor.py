@@ -26,8 +26,8 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
       return schema._params['pattern']
 
     if 'numeric' in schema._params:
-      return r'^[0-9]*$'
-    
+      return r'^\-?[0-9]+$'
+
     if 'lowercase' in schema._params:
       pattern = 'a-z'
     elif 'uppercase' in schema._params:
@@ -161,6 +161,22 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
     is_pattern_match = self.__is_pattern_match(actual_val, pattern)
     if not is_pattern_match:
       return [ValidationPatternMismatchError(path, actual_val, pattern)]
+
+    if 'numeric_min' in schema._params:
+      if int(actual_val) < schema._params['numeric_min']:
+        return [ValidationMinValueError(
+          path,
+          '"{}"'.format(actual_val),
+          '"{}"'.format(schema._params['numeric_min'])
+        )]
+
+    if 'numeric_max' in schema._params:
+      if int(actual_val) > schema._params['numeric_max']:
+        return [ValidationMaxValueError(
+          path,
+          '"{}"'.format(actual_val),
+          '"{}"'.format(schema._params['numeric_max'])
+        )]
 
     if 'length' in schema._params:
       if not self.__is_length_match(actual_val, schema._params['length'], '__eq__'):
