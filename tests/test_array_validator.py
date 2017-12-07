@@ -87,14 +87,23 @@ class TestArrayValidator(ValidatorTestCase):
     self.assertValidationFails([0, 1],   schema.array.contains_one(schema.integer(42)))
 
   def test_it_validates_many_occurrences(self):
-    self.assertValidationPasses([42 ,42], schema.array.contains_many(schema.integer(42)))
-    self.assertValidationPasses([1 ,2, 42, 3, 42, 4, 5],
+    self.assertValidationPasses([42, 42], schema.array.contains_many(schema.integer(42)))
+    self.assertValidationPasses([1, 2, 42, 3, 42, 4, 5],
                                 schema.array.contains_many(schema.integer(42)))
 
     self.assertValidationFails([],            schema.array.contains_many(schema.integer(42)))
     self.assertValidationFails([42],          schema.array.contains_many(schema.integer(42)))
     self.assertValidationFails([1, 2, 42, 3], schema.array.contains_many(schema.integer(42)))
     self.assertValidationFails([0, 1],        schema.array.contains_many(schema.integer(42)))
+
+  def test_it_validates_all_occurrences(self):
+    array_schema = schema.array.contains_all([schema.boolean(True), schema.boolean(False)])
+
+    self.assertValidationPasses([False, True],              array_schema)
+    self.assertValidationPasses([False, True, True, None],  array_schema)
+
+    self.assertValidationFails([False, False],              array_schema)
+    self.assertValidationFails([],                          array_schema)
 
   def test_it_validates_nullable(self):
     with warnings.catch_warnings():

@@ -14,6 +14,6 @@ setup(
     'Delorean==0.5.0'
   ],
   dependency_links=[
-    'https://github.com/nikitanovosibirsk/district42/tarball/9c25d60a2082dd266e3251dec529a2334bf24300#egg=district42-0.6.1'
+    'https://github.com/nikitanovosibirsk/district42/tarball/3c2b823322ef874b9540beccb2fcefb4938bb161#egg=district42-0.6.1'
   ]
 )

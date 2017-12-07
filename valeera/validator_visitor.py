@@ -309,6 +309,10 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
       count = self.__count_occurrences(schema._params['contains_many'], actual_val, pointer)
       if count < 2:
         errors.append(ValidationMinOccurrenceError(path, schema._params['contains_many'], 2))
+    elif 'contains_all' in schema._params:
+      for item in schema._params['contains_all']:
+        if self.__count_occurrences(item, actual_val, pointer) == 0:
+          errors.append(ValidationMinOccurrenceError(path, item, 1))
 
     if 'length' in schema._params:
       if not self.__is_length_match(actual_val, schema._params['length'], '__eq__'):
