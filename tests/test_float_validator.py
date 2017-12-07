@@ -1,3 +1,4 @@
+import math
 import unittest
 import warnings
 
@@ -31,17 +32,50 @@ class TestFloatValidator(ValidatorTestCase):
     self.assertValidationFails(3,     schema.float(3.14))
     self.assertValidationFails('0.0', schema.float.zero)
 
+  def test_it_validates_value_with_precision(self):
+    self.assertValidationPasses(3.1416, schema.float(math.pi).precision(3))
+    self.assertValidationPasses(3.1414, schema.float(math.pi).precision(3))
+    self.assertValidationPasses(-3.1416, schema.float(-math.pi).precision(3))
+    self.assertValidationPasses(-3.1414, schema.float(-math.pi).precision(3))
+
+    self.assertValidationFails(3.142, schema.float(math.pi).precision(3))
+    self.assertValidationFails(-3.142, schema.float(-math.pi).precision(3))
+
   def test_it_validates_min_value(self):
     self.assertValidationPasses(3.14, schema.float.min(3.14))
     self.assertValidationPasses(3.15, schema.float.min(3.14))
 
     self.assertValidationFails(-3.14, schema.float.min(-3.13))
 
+  def test_it_validates_min_value_with_precision(self):
+    self.assertValidationPasses(3.141, schema.float.min(math.pi).precision(3))
+    self.assertValidationPasses(3.1414, schema.float.min(math.pi).precision(3))
+    self.assertValidationPasses(3.1416, schema.float.min(math.pi).precision(3))
+
+    self.assertValidationPasses(-3.141, schema.float.min(-math.pi).precision(3))
+    self.assertValidationPasses(-3.1414, schema.float.min(-math.pi).precision(3))
+    self.assertValidationPasses(-3.1416, schema.float(-math.pi).precision(3))
+
+    self.assertValidationFails(3.140, schema.float.min(math.pi).precision(3))
+    self.assertValidationFails(-3.142, schema.float.min(-math.pi).precision(3))
+
   def test_it_validates_max_value(self):
     self.assertValidationPasses(3.13, schema.float.max(3.14))
     self.assertValidationPasses(3.14, schema.float.max(3.14))
     
     self.assertValidationFails(3.15, schema.float.max(3.14))
+
+  def test_it_validates_max_value_with_precision(self):
+    self.assertValidationPasses(3.141, schema.float.max(math.pi).precision(3))
+    self.assertValidationPasses(3.1414, schema.float.max(math.pi).precision(3))
+    self.assertValidationPasses(3.1416, schema.float.max(math.pi).precision(3))
+
+    self.assertValidationPasses(-3.141, schema.float.max(-math.pi).precision(3))
+    self.assertValidationPasses(-3.1414, schema.float.max(-math.pi).precision(3))
+    self.assertValidationPasses(-3.1416, schema.float(-math.pi).precision(3))
+
+    self.assertValidationFails(3.142, schema.float.max(math.pi).precision(3))
+    self.assertValidationFails(-3.140, schema.float.max(-math.pi).precision(3))
 
   def test_it_validates_nullable(self):
     with warnings.catch_warnings():

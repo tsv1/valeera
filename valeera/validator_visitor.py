@@ -1,3 +1,6 @@
+from decimal import ROUND_CEILING, ROUND_FLOOR, Decimal
+from sys import float_info
+
 import district42.json_schema
 
 from .errors import *
@@ -73,7 +76,13 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
     from urllib.parse import urlparse
     attrs = urlparse(actual_val)
     return attrs.netloc or attrs.path
-  
+
+  def __quantize(self, value, places, rounding=None):
+    if rounding is None:
+      rounding = ROUND_FLOOR if (value >= 0) else ROUND_CEILING
+    formatted_value = format(value, '.{}f'.format(float_info.dig))
+    return Decimal(formatted_value).quantize(Decimal(10) ** -places, rounding)
+
   def visit_null(self, schema, pointer):
     path, actual_val = pointer.path(), pointer.value()
 
@@ -114,20 +123,45 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
       expected_types = ['number', 'null'] if is_nullable else 'number'
       return [ValidationTypeError(path, actual_val, expected_types)]
 
-    if 'value' in schema._params:
+    places = schema._params['precision'] if ('precision' in schema._params) else 9
+    actual_decimal = self.__quantize(actual_val, places)
+
+    if ('value' in schema._params) and ('float' in schema._params):
+      expected_decimal = self.__quantize(schema._params['value'], places)
+      if actual_decimal != expected_decimal:
+        actual_formatted = format(actual_decimal, '.{}f'.format(places))
+        expected_formatted = format(expected_decimal, '.{}f'.format(places))
+        return [ValidationValueError(path, actual_formatted, expected_formatted, 'float')]
+    elif 'value' in schema._params:
       expected_val = schema._params['value']
       is_value_valid = self.__is_value_valid(actual_val, expected_val, is_nullable)
       if not is_value_valid:
-        return [ValidationValueError(path, actual_val, expected_val)]
+        return [ValidationValueError(path, actual_val, expected_val, 'int')]
 
     errors = []
+    if 'float' in schema._params:
+      errors = []
+      if 'min_value' in schema._params:
+        expected_decimal = self.__quantize(schema._params['min_value'], places)
+        if actual_decimal < expected_decimal:
+          actual_formatted = format(actual_decimal, '.{}f'.format(places))
+          expected_formatted = format(expected_decimal, '.{}f'.format(places))
+          errors += [ValidationMinValueError(path, actual_formatted, expected_formatted, 'float')]
+      if 'max_value' in schema._params:
+        expected_decimal = self.__quantize(schema._params['max_value'], places)
+        if actual_decimal > expected_decimal:
+          actual_formatted = format(actual_decimal, '.{}f'.format(places))
+          expected_formatted = format(expected_decimal, '.{}f'.format(places))
+          errors += [ValidationMaxValueError(path, actual_formatted, expected_formatted, 'float')]
+      return errors
+
     if 'min_value' in schema._params:
       if actual_val < schema._params['min_value']:
-        errors += [ValidationMinValueError(path, actual_val, schema._params['min_value'])]
+        errors += [ValidationMinValueError(path, actual_val, schema._params['min_value'], 'int')]
 
     if 'max_value' in schema._params:
       if actual_val > schema._params['max_value']:
-        errors += [ValidationMaxValueError(path, actual_val, schema._params['max_value'])]
+        errors += [ValidationMaxValueError(path, actual_val, schema._params['max_value'], 'int')]
 
     if ('multiple' in schema._params) and (actual_val % schema._params['multiple'] != 0):
       errors += [ValidationRemainderError(path, actual_val, schema._params['multiple'])]
