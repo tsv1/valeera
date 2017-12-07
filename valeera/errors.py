@@ -1,15 +1,15 @@
 class ValidationError:
 
-  def _get_type_as_string(self, value):
-    return str(type(value))[8:-2]
+  def _get_type_as_string(self, value, type_hint=None):
+    return type_hint if type_hint else str(type(value))[8:-2]
 
 
 class ValidationTypeError(ValidationError):
 
-  def __init__(self, path, actual_val, expected_types):
+  def __init__(self, path, actual_val, expected_types, type_hint=None):
     self.path = path
     self.actual_val = actual_val
-    self.actual_type = self._get_type_as_string(actual_val)
+    self.actual_type = self._get_type_as_string(actual_val, type_hint)
     self.expected_types = expected_types if type(expected_types) is list else [expected_types]
 
   def format(self, formatter):
@@ -18,10 +18,10 @@ class ValidationTypeError(ValidationError):
 
 class ValidationValueError(ValidationError):
 
-  def __init__(self, path, actual_val, expected_val):
+  def __init__(self, path, actual_val, expected_val, type_hint=None):
     self.path = path
     self.actual_val = actual_val
-    self.actual_type = self._get_type_as_string(actual_val)
+    self.actual_type = self._get_type_as_string(actual_val, type_hint)
     self.expected_val = expected_val
 
   def format(self, formatter):
@@ -30,10 +30,10 @@ class ValidationValueError(ValidationError):
 
 class ValidationMinValueError(ValidationError):
 
-  def __init__(self, path, actual_val, min_value):
+  def __init__(self, path, actual_val, min_value, type_hint=None):
     self.path = path
     self.actual_val = actual_val
-    self.actual_type = self._get_type_as_string(actual_val)
+    self.actual_type = self._get_type_as_string(actual_val, type_hint)
     self.min_value = min_value
   
   def format(self, formatter):
@@ -42,10 +42,10 @@ class ValidationMinValueError(ValidationError):
 
 class ValidationMaxValueError(ValidationError):
 
-  def __init__(self, path, actual_val, max_value):
+  def __init__(self, path, actual_val, max_value, type_hint=None):
     self.path = path
     self.actual_val = actual_val
-    self.actual_type = self._get_type_as_string(actual_val)
+    self.actual_type = self._get_type_as_string(actual_val, type_hint)
     self.max_value = max_value
   
   def format(self, formatter):
