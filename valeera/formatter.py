@@ -79,6 +79,13 @@ class Formatter(AbstractFormatter):
     return message + ' must be equal to {}, {} given'.format(repr(error.expected_val),
                                                              repr(error.actual_val))
 
+  def format_substring_error(self, error):
+    message = 'String'
+    if error.path != Pointer.root:
+      message += ' ' + error.path
+    return message + ' must contains "{}", {} given'.format(error.expected_substring,
+                                                            repr(error.actual_val))
+
   def format_min_value_error(self, error):
     actual_type = self.__to_json_type(error.actual_type)
    

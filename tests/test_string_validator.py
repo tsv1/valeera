@@ -44,6 +44,15 @@ class TestStringValidator(ValidatorTestCase):
 
     self.assertValidationFails('banana', schema.string.pattern(r'^[0-9]+$'))
 
+  def test_it_validates_contains(self):
+    self.assertValidationPasses('banana', schema.string.contains(''))
+    self.assertValidationPasses('banana', schema.string.contains('banana'))
+    self.assertValidationPasses('abcbanana', schema.string.contains('banana'))
+    self.assertValidationPasses('bananaabc', schema.string.contains('banana'))
+    self.assertValidationPasses(' banana ', schema.string.contains('banana'))
+
+    self.assertValidationFails('', schema.string.contains('banana'))
+
   def test_it_validates_numeric(self):
     self.assertValidationPasses('1234',        schema.string.numeric)
     self.assertValidationPasses('-1234',       schema.string.numeric)

@@ -28,6 +28,17 @@ class ValidationValueError(ValidationError):
     return formatter.format_value_error(self)
 
 
+class ValidationSubstringError(ValidationValueError):
+
+  def __init__(self, path, actual_val, expected_substring):
+    self.path = path
+    self.actual_val = actual_val
+    self.expected_substring = expected_substring
+
+  def format(self, formatter):
+    return formatter.format_substring_error(self)
+
+
 class ValidationMinValueError(ValidationValueError):
 
   def __init__(self, path, actual_val, min_value, type_hint=None):

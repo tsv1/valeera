@@ -234,6 +234,11 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
     if not is_pattern_match:
       return [ValidationPatternMismatchError(path, actual_val, pattern)]
 
+    if 'contains' in schema._params:
+      substring = schema._params['contains']
+      if substring not in actual_val:
+        return [ValidationSubstringError(path, actual_val, substring)]
+
     if 'numeric_min' in schema._params:
       if int(actual_val) < schema._params['numeric_min']:
         return [ValidationMinValueError(

@@ -6,6 +6,9 @@ class AbstractFormatter:
   def format_value_error(self, error):
     raise NotImplementedError()
 
+  def format_substring_error(self, error):
+    raise NotImplementedError()
+
   def format_min_value_error(self, error):
     raise NotImplementedError()
 
