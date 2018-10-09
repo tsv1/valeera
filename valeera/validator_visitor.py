@@ -56,15 +56,13 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
   def __get_error_priority(self, error):
     if isinstance(error, ValidationLengthError):
       return 3
-    elif isinstance(error, ValidationIndexError):
-      return 3
-    elif isinstance(error, ValidationMissingKeyError):
+    elif isinstance(error, ValidationMissingKeyError) or isinstance(error, ValidationIndexError):
       return 3
     elif isinstance(error, ValidationTypeError):
       return 4
-    elif isinstance(error, ValidationExtraKeyError):
+    elif isinstance(error, ValidationExtraKeyError) or isinstance(error, ValidationValueError):
       return 5
-    elif isinstance(error, ValidationValueError):
+    elif isinstance(error, ValidationOccurrenceError):
       return 5
     else:
       return 1
@@ -338,11 +336,11 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
     elif 'contains' in schema._params:
       count, best_match = self.__count_occurrences(schema._params['contains'], actual_val, pointer)
       if count == 0:
-        errors.append(ValidationMinOccurrenceError(path, schema._params['contains'], 1))
+        errors.append(ValidationMinOccurrenceError(path, schema._params['contains'], 1, best_match))
     elif 'contains_one' in schema._params:
       count, best_match = self.__count_occurrences(schema._params['contains_one'], actual_val, pointer)
       if count != 1:
-        errors.append(ValidationExactlyOccurrenceError(path, schema._params['contains_one'], 1))
+        errors.append(ValidationExactlyOccurrenceError(path, schema._params['contains_one'], 1, best_match))
     elif 'contains_many' in schema._params:
       count, best_match = self.__count_occurrences(schema._params['contains_many'], actual_val, pointer)
       if count < 2:

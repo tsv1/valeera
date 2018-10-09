@@ -151,7 +151,11 @@ class ValidationIndexError(ValidationError):
     return formatter.format_index_error(self)
 
 
-class ValidationMinOccurrenceError(ValidationError):
+class ValidationOccurrenceError(ValidationError):
+  pass
+
+
+class ValidationMinOccurrenceError(ValidationOccurrenceError):
   
   def __init__(self, path, expected_schema, min_count, best_match=None):
     self.path = path
@@ -163,12 +167,13 @@ class ValidationMinOccurrenceError(ValidationError):
     return formatter.format_min_occurrence_error(self)
 
 
-class ValidationExactlyOccurrenceError(ValidationError):
+class ValidationExactlyOccurrenceError(ValidationOccurrenceError):
   
-  def __init__(self, path, expected_schema, exactly_count):
+  def __init__(self, path, expected_schema, exactly_count, best_match=None):
     self.path = path
     self.expected_schema = expected_schema
     self.exactly_count = exactly_count
+    self.best_match = best_match
 
   def format(self, formatter):
     return formatter.format_exactly_occurrence_error(self)

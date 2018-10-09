@@ -189,11 +189,24 @@ class Formatter(AbstractFormatter):
     if error.path != Pointer.root:
       message += ' ' + error.path
     
-    return message + ' must contain exactly {} occurrence{} of {}'.format(
+    message += ' must contain exactly {} occurrence{} of {}'.format(
       error.exactly_count,
       '' if error.exactly_count == 1 else 's',
       error.expected_schema
     )
+
+    if error.best_match:
+      if error.best_match['index'] == -1:
+        message += '\nBut empty array given'
+      else:
+        details = [error.format(self) for error in error.best_match['errors']]
+        message += '\nClosest match is {} {}\n{}'.format(
+          error.path + '[{}]'.format(error.best_match['index']),
+          self.__dump(error.best_match['item']),
+          '\n'.join(details),
+        )
+
+    return message
 
   def format_uniqueness_error(self, error):
     message = 'Array'
