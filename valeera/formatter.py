@@ -1,3 +1,5 @@
+from json import dumps
+
 from .abstract_formatter import AbstractFormatter
 from .pointer import Pointer
 
@@ -38,6 +40,9 @@ class Formatter(AbstractFormatter):
       element += 's'
 
     return message + ' must have {} {} {}'.format(accuracy, expected_length, element)
+
+  def __dump(self, smth):
+    return dumps(smth, ensure_ascii=False, indent=4, default=str)
 
   def format_type_error(self, error):
     actual_type = self.__to_json_type(error.actual_type)
@@ -159,11 +164,24 @@ class Formatter(AbstractFormatter):
     if error.path != Pointer.root:
       message += ' ' + error.path
     
-    return message + ' must contain at least {} occurrence{} of {}'.format(
+    message += ' must contain at least {} occurrence{} of {}'.format(
       error.min_count,
       '' if error.min_count == 1 else 's',
       error.expected_schema
     )
+
+    if error.best_match:
+      if error.best_match['index'] == -1:
+        message += '\nBut empty array given'
+      else:
+        details = [error.format(self) for error in error.best_match['errors']]
+        message += '\nClosest match is {} {}\n{}'.format(
+          error.path + '[{}]'.format(error.best_match['index']),
+          self.__dump(error.best_match['item']),
+          '\n'.join(details),
+        )
+
+    return message
 
   def format_exactly_occurrence_error(self, error):
     message = 'Array'

@@ -53,13 +53,51 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
   def __is_length_match(self, actual_val, expected_length, comparator):
     return getattr(len(actual_val), comparator)(expected_length)
 
+  def __get_error_priority(self, error):
+    if isinstance(error, ValidationLengthError):
+      return 3
+    elif isinstance(error, ValidationIndexError):
+      return 3
+    elif isinstance(error, ValidationMissingKeyError):
+      return 3
+    elif isinstance(error, ValidationTypeError):
+      return 4
+    elif isinstance(error, ValidationExtraKeyError):
+      return 5
+    elif isinstance(error, ValidationValueError):
+      return 5
+    else:
+      return 1
+
+  def __get_best_match_index(self, matches):
+    candidates = []
+    for index, errors in enumerate(matches):
+      priority = 0
+      for error in errors:
+        priority += self.__get_error_priority(error)
+      candidates += [(index, len(errors), priority)]
+
+    if len(candidates) == 0:
+      return -1
+
+    candidates.sort(key=lambda x: (x[-2], -x[-1]))
+    index, *_ = candidates[0]
+    return index
+
   def __count_occurrences(self, schema, array, pointer):
     count = 0
+    matches = []
     for index, item in enumerate(array):
       errors = schema.accept(self, pointer.move(index))
+      matches += [errors]
       if len(errors) == 0:
         count += 1
-    return count
+    best_match_index = self.__get_best_match_index(matches)
+    return count, {
+      'index': best_match_index,
+      'item': array[best_match_index] if best_match_index >= 0 else None,
+      'errors': matches[best_match_index] if best_match_index >= 0 else None,
+    }
 
   def __is_undefined(self, schema):
     return type(schema) is district42.json_schema.types.Undefined
@@ -298,21 +336,22 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
       if not self.__is_length_match(actual_val, expected_length, '__le__'):
         errors.append(ValidationLengthError(path, actual_val, expected_length))
     elif 'contains' in schema._params:
-      count = self.__count_occurrences(schema._params['contains'], actual_val, pointer)
+      count, best_match = self.__count_occurrences(schema._params['contains'], actual_val, pointer)
       if count == 0:
         errors.append(ValidationMinOccurrenceError(path, schema._params['contains'], 1))
     elif 'contains_one' in schema._params:
-      count = self.__count_occurrences(schema._params['contains_one'], actual_val, pointer)
+      count, best_match = self.__count_occurrences(schema._params['contains_one'], actual_val, pointer)
       if count != 1:
         errors.append(ValidationExactlyOccurrenceError(path, schema._params['contains_one'], 1))
     elif 'contains_many' in schema._params:
-      count = self.__count_occurrences(schema._params['contains_many'], actual_val, pointer)
+      count, best_match = self.__count_occurrences(schema._params['contains_many'], actual_val, pointer)
       if count < 2:
         errors.append(ValidationMinOccurrenceError(path, schema._params['contains_many'], 2))
     elif 'contains_all' in schema._params:
       for item in schema._params['contains_all']:
-        if self.__count_occurrences(item, actual_val, pointer) == 0:
-          errors.append(ValidationMinOccurrenceError(path, item, 1))
+        count, best_match = self.__count_occurrences(item, actual_val, pointer)
+        if count == 0:
+          errors.append(ValidationMinOccurrenceError(path, item, 1, best_match))
 
     if 'length' in schema._params:
       if not self.__is_length_match(actual_val, schema._params['length'], '__eq__'):

@@ -28,7 +28,7 @@ class ValidationValueError(ValidationError):
     return formatter.format_value_error(self)
 
 
-class ValidationMinValueError(ValidationError):
+class ValidationMinValueError(ValidationValueError):
 
   def __init__(self, path, actual_val, min_value, type_hint=None):
     self.path = path
@@ -40,7 +40,7 @@ class ValidationMinValueError(ValidationError):
     return formatter.format_min_value_error(self)
 
 
-class ValidationMaxValueError(ValidationError):
+class ValidationMaxValueError(ValidationValueError):
 
   def __init__(self, path, actual_val, max_value, type_hint=None):
     self.path = path
@@ -52,7 +52,7 @@ class ValidationMaxValueError(ValidationError):
     return formatter.format_max_value_error(self)
 
 
-class ValidationRemainderError(ValidationError):
+class ValidationRemainderError(ValidationValueError):
 
   def __init__(self, path, actual_val, divisor):
     self.path = path
@@ -64,7 +64,7 @@ class ValidationRemainderError(ValidationError):
     return formatter.format_remainder_error(self)
 
 
-class ValidationUriError(ValidationError):
+class ValidationUriError(ValidationValueError):
   
   def __init__(self, path, actual_val):
     self.path = path
@@ -74,7 +74,7 @@ class ValidationUriError(ValidationError):
     return formatter.format_uri_error(self)
 
 
-class ValidationPatternMismatchError(ValidationError):
+class ValidationPatternMismatchError(ValidationValueError):
 
   def __init__(self, path, actual_val, pattern):
     self.path = path
@@ -85,7 +85,7 @@ class ValidationPatternMismatchError(ValidationError):
     return formatter.format_pattern_mismatch_error(self)
 
 
-class ValidationTimestampError(ValidationError):
+class ValidationTimestampError(ValidationValueError):
   
   def __init__(self, path, actual_val):
     self.path = path
@@ -95,7 +95,7 @@ class ValidationTimestampError(ValidationError):
     return formatter.format_timestamp_error(self)
 
 
-class ValidationTimestampFormatError(ValidationError):
+class ValidationTimestampFormatError(ValidationValueError):
 
   def __init__(self, path, actual_val, timestamp_format):
     self.path = path
@@ -106,7 +106,7 @@ class ValidationTimestampFormatError(ValidationError):
     return formatter.format_timestamp_format_error(self)
 
 
-class ValidationLengthError(ValidationError):
+class ValidationLengthError(ValidationValueError):
   
   def __init__(self, path, actual_val, length):
     self.path = path
@@ -118,7 +118,7 @@ class ValidationLengthError(ValidationError):
     return formatter.format_length_error(self)
 
 
-class ValidationMinLengthError(ValidationError):
+class ValidationMinLengthError(ValidationLengthError):
   
   def __init__(self, path, actual_val, min_length):
     self.path = path
@@ -130,7 +130,7 @@ class ValidationMinLengthError(ValidationError):
     return formatter.format_min_length_error(self)
 
 
-class ValidationMaxLengthError(ValidationError):
+class ValidationMaxLengthError(ValidationLengthError):
   
   def __init__(self, path, actual_val, max_length):
     self.path = path
@@ -153,10 +153,11 @@ class ValidationIndexError(ValidationError):
 
 class ValidationMinOccurrenceError(ValidationError):
   
-  def __init__(self, path, expected_schema, min_count):
+  def __init__(self, path, expected_schema, min_count, best_match=None):
     self.path = path
     self.expected_schema = expected_schema
     self.min_count = min_count
+    self.best_match = best_match
 
   def format(self, formatter):
     return formatter.format_min_occurrence_error(self)
@@ -173,7 +174,7 @@ class ValidationExactlyOccurrenceError(ValidationError):
     return formatter.format_exactly_occurrence_error(self)
 
 
-class ValidationUniquenessError(ValidationError):
+class ValidationUniquenessError(ValidationValueError):
   
   def __init__(self, path, actual_val):
     self.path = path
@@ -202,7 +203,7 @@ class ValidationExtraKeyError(ValidationError):
     return formatter.format_extra_key_error(self)
 
 
-class ValidationSchemaMismatchError(ValidationError):
+class ValidationSchemaMismatchError(ValidationTypeError):
 
   def __init__(self, path, actual_val, options):
     self.path = path
@@ -214,7 +215,7 @@ class ValidationSchemaMismatchError(ValidationError):
     return formatter.format_schema_mismatch_error(self)
 
 
-class ValidationSingleSchemaMismatchError(ValidationError):
+class ValidationSingleSchemaMismatchError(ValidationTypeError):
 
   def __init__(self, path, actual_val, options):
     self.path = path
@@ -226,7 +227,7 @@ class ValidationSingleSchemaMismatchError(ValidationError):
     return formatter.format_single_schema_mismatch_error(self)
 
 
-class ValidationEnumerationError(ValidationError):
+class ValidationEnumerationError(ValidationTypeError):
 
   def __init__(self, path, actual_val, enumerators):
     self.path = path
