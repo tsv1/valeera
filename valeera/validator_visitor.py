@@ -70,6 +70,8 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
   def __get_best_match_index(self, matches):
     candidates = []
     for index, errors in enumerate(matches):
+      if len(errors) == 0:
+        continue
       priority = 0
       for error in errors:
         priority += self.__get_error_priority(error)
@@ -344,7 +346,7 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
     elif 'contains_many' in schema._params:
       count, best_match = self.__count_occurrences(schema._params['contains_many'], actual_val, pointer)
       if count < 2:
-        errors.append(ValidationMinOccurrenceError(path, schema._params['contains_many'], 2))
+        errors.append(ValidationMinOccurrenceError(path, schema._params['contains_many'], 2, best_match))
     elif 'contains_all' in schema._params:
       for item in schema._params['contains_all']:
         count, best_match = self.__count_occurrences(item, actual_val, pointer)
