@@ -1,6 +1,8 @@
 from decimal import ROUND_CEILING, ROUND_FLOOR, Decimal
 from sys import float_info
+from datetime import datetime, timezone
 
+import delorean
 import district42.json_schema
 
 from .errors import *
@@ -281,11 +283,20 @@ class ValidatorVisitor(district42.json_schema.AbstractVisitor):
       expected_types = ['timestamp', 'null'] if is_nullable else 'timestamp'
       return [ValidationTypeError(path, actual_val, expected_types)]
 
-    try:
-      import delorean
-      timestamp = delorean.parse(actual_val)
-    except ValueError:
-      return [ValidationTimestampError(path, actual_val)]
+    if 'format' in schema._params:
+      try:
+        dt = datetime.strptime(actual_val, schema._params['format'])
+      except (TypeError, ValueError):
+        return [ValidationTimestampError(path, actual_val)]
+
+      if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+      timestamp = delorean.epoch(dt.timestamp())
+    else:
+      try:
+        timestamp = delorean.parse(actual_val)
+      except (TypeError, ValueError):
+        return [ValidationTimestampError(path, actual_val)]
 
     if 'value' in schema._params:
       expected_val = schema._params['value']

@@ -73,3 +73,10 @@ class TestTimestampValidator(ValidatorTestCase):
       self.assertValidationFails(0,     schema.timestamp.nullable)
       self.assertValidationFails([],    schema.timestamp.nullable)
       self.assertValidationFails({},    schema.timestamp.nullable)
+
+  def test_it_validates_ambiguous_cases(self):
+    timestamp = schema.timestamp('03 Feb 2020')
+    self.assertValidationFails('2020-02-03', timestamp)
+
+    timestamp = schema.timestamp('03 Feb 2020').format('%Y-%m-%d')
+    self.assertValidationPasses('2020-02-03', timestamp)
