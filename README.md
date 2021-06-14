@@ -1,6 +1,6 @@
 # valeera
 
-Validator for [district42 schema](https://github.com/nikitanovosibirsk/district42).
+Validator for [district42](https://github.com/nikitanovosibirsk/district42) schema.
 
 
 ## Installation
